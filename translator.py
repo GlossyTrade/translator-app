@@ -42,6 +42,7 @@ col1, col2 = st.columns([1, 5])
 with col1:
     if st.button("🗑️ Löschen"):
         st.session_state.input_text = ""
+        st.session_state.input_area = ""
         st.session_state.translation = ""
         st.rerun()
 with col2:
