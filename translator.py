@@ -37,14 +37,18 @@ input_text = st.text_area(
     key="input_area",
 )
 
-# Buttons: Übersetzen + Löschen nebeneinander
+# Callback-Funktion für den Löschen-Button
+# (Streamlit erlaubt Widget-State-Änderungen nur in on_click-Callbacks,
+#  nicht direkt im Script-Body)
+def clear_fields():
+    st.session_state.input_text = ""
+    st.session_state.input_area = ""
+    st.session_state.translation = ""
+
+# Buttons: Löschen + Übersetzen nebeneinander
 col1, col2 = st.columns([1, 5])
 with col1:
-    if st.button("🗑️ Löschen"):
-        st.session_state.input_text = ""
-        st.session_state.input_area = ""
-        st.session_state.translation = ""
-        st.rerun()
+    st.button("🗑️ Löschen", on_click=clear_fields)
 with col2:
     translate = st.button("Übersetzen", type="primary", disabled=not input_text.strip())
 
@@ -80,19 +84,19 @@ if st.session_state.translation:
 
     # Kopieren-Button via JavaScript
     copy_js = f"""
-        <script>
-        function copyText() {{
-            navigator.clipboard.writeText({repr(st.session_state.translation)}).then(function() {{
-                const btn = document.getElementById('copyBtn');
-                btn.innerText = '✅ Kopiert!';
-                setTimeout(() => btn.innerText = '📋 Kopieren', 2000);
-            }});
-        }}
-        </script>
-        <button id="copyBtn" onclick="copyText()"
-            style="background-color:#4CAF50; color:white; border:none; padding:8px 16px;
-                   border-radius:6px; cursor:pointer; font-size:14px;">
-            📋 Kopieren
-        </button>
+    <script>
+    function copyText() {{
+        navigator.clipboard.writeText({repr(st.session_state.translation)}).then(function() {{
+            const btn = document.getElementById('copyBtn');
+            btn.innerText = '✅ Kopiert!';
+            setTimeout(() => btn.innerText = '📋 Kopieren', 2000);
+        }});
+    }}
+    </script>
+    <button id="copyBtn" onclick="copyText()"
+    style="background-color:#4CAF50; color:white; border:none; padding:8px 16px;
+           border-radius:6px; cursor:pointer; font-size:14px;">
+        📋 Kopieren
+    </button>
     """
     st.components.v1.html(copy_js, height=50)
